@@ -32,7 +32,7 @@ namespace SportsStore.UnitTests
             controller.PageSize = 3;
 
             //act
-            ProductsListViewModel result = (ProductsListViewModel)controller.List(2).Model;
+            ProductsListViewModel result = (ProductsListViewModel)controller.List(null, 2).Model;
 
             //assert
             Product[] prodArray = result.Products.ToArray();
@@ -84,7 +84,7 @@ namespace SportsStore.UnitTests
             controller.PageSize = 3;
 
             //act
-            ProductsListViewModel result = (ProductsListViewModel)controller.List(2).Model;
+            ProductsListViewModel result = (ProductsListViewModel)controller.List(null, 2).Model;
 
             //assert
             PagingInfo pageInfo = result.PagingInfo;
@@ -93,6 +93,8 @@ namespace SportsStore.UnitTests
             Assert.AreEqual(pageInfo.TotalItems, 5);
             Assert.AreEqual(pageInfo.TotalPages, 2);
         }
+
+        //tester l'action qui filtre les produits par categories
 
     }
 }
