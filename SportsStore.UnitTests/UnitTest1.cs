@@ -95,6 +95,10 @@ namespace SportsStore.UnitTests
         }
 
         //tester l'action qui filtre les produits par categories
-
+        //generating the category list
+        //reporting the selected category
+        //category-specific product counts
+        //testing the cart
+        //creating multiple html forms in a page
     }
 }
