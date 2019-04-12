@@ -4,8 +4,12 @@ using SportsStore.WebUI.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Script.Serialization;
 
 namespace SportsStore.WebUI.Controllers
 {
@@ -72,7 +76,7 @@ namespace SportsStore.WebUI.Controllers
         }
 
         [HttpPost]
-        public ViewResult Checkout(Cart cart, ShippingDetails shippingDetails)
+        public async Task<HttpResponseMessage> Checkout(Cart cart, ShippingDetails shippingDetails)
         {
             if (cart.Lines.Count() == 0)
             {
@@ -83,12 +87,30 @@ namespace SportsStore.WebUI.Controllers
             {
                 orderProcessor.ProcessOrder(cart, shippingDetails);
                 cart.Clear();
-                return View("Completed");
+                //envoyer vers api pour creation de la futur transaction
+                //creation d'un objet httpclient
+                string urlApi = "https://localhost:44317/api/Payment/Post";
+                using (var client = new HttpClient())
+                using (var request = new HttpRequestMessage())
+                {
+                    request.Method = HttpMethod.Post;
+                    request.RequestUri = new Uri(urlApi);
+                    var json = new JavaScriptSerializer().Serialize(shippingDetails);
+                    request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                    return await client.SendAsync(request);
+                }   
             }
             else
             {
-                return View(shippingDetails);
+                Checkout();
+                return null;
             }
+        }
+
+        public void GetPaymentId(int paymentId)
+        {
+
         }
     }
 }
