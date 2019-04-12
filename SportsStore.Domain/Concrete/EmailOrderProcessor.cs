@@ -12,20 +12,26 @@ namespace SportsStore.Domain.Concrete
 {
     public class EmailSettings
     {
-        public string MailToAddress { get; set; }
-        public string MailFromAddress { get; set; }
+        public string MailToAddress = "mdemaleingreau@gmail.com";
+        public string MailFromAddress = "sportstore@gmail.com";
         public bool UseSsl = true;
         public string Username = "MySmtpUsername";
         public string Password = "MySmtpPassword";
         public string ServerName = "smtp.example.com";
         public int SeverPort = 55147;
         public bool WriteAsFile = true;
-        public string FileLocation = @"D:\Users\Proprietaire\source\repos\MatDm\SportsStore\sports_store_emails";
+        public string FileLocationHome = @"D:\Users\Proprietaire\source\repos\MatDm\SportsStore\sports_store_emails";
+        public string FileLocationBT = @"C:\Users\demaleingreau.m\source\repos\SportsStore\sports_store_emails";
     }
 
     public class EmailOrderProcessor : IOrderProcessor
     {
         private EmailSettings emailSettings;
+
+        public EmailOrderProcessor(EmailSettings settings)
+        {
+            emailSettings = settings;
+        }
 
         public void ProcessOrder(Cart cart, ShippingDetails shippingDetails)
         {
@@ -40,7 +46,14 @@ namespace SportsStore.Domain.Concrete
                 if (emailSettings.WriteAsFile)
                 {
                     smtpClient.DeliveryMethod = SmtpDeliveryMethod.SpecifiedPickupDirectory;
-                    smtpClient.PickupDirectoryLocation = emailSettings.FileLocation;
+                    if (emailSettings.FileLocationBT == null)
+                    {
+                        smtpClient.PickupDirectoryLocation = emailSettings.FileLocationHome;
+                    }
+                    else
+                    {
+                        smtpClient.PickupDirectoryLocation = emailSettings.FileLocationBT;
+                    }
                     smtpClient.EnableSsl = false;
                 }
 
