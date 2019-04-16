@@ -76,7 +76,7 @@ namespace SportsStore.WebUI.Controllers
         }
 
         [HttpPost]
-        public async Task<HttpResponseMessage> Checkout(Cart cart, ShippingDetails shippingDetails)
+        public async Task<ActionResult> Checkout(Cart cart, ShippingDetails shippingDetails)
         {
             if (cart.Lines.Count() == 0)
             {
@@ -86,25 +86,34 @@ namespace SportsStore.WebUI.Controllers
             if (ModelState.IsValid)
             {
                 orderProcessor.ProcessOrder(cart, shippingDetails);
-                cart.Clear();
+                //cart.Clear();
+                var amount = cart.ComputeTotalValue();
                 //envoyer vers api pour creation de la futur transaction
                 //creation d'un objet httpclient
-                string urlApi = "https://localhost:44317/api/Payment/Post";
+                string urlApi = "https://localhost:44347/api/Payment";
                 using (var client = new HttpClient())
                 using (var request = new HttpRequestMessage())
                 {
-                    request.Method = HttpMethod.Post;
+                    request.Method = HttpMethod.Post; 
                     request.RequestUri = new Uri(urlApi);
-                    var json = new JavaScriptSerializer().Serialize(shippingDetails);
+                    var json = new JavaScriptSerializer().Serialize(amount);
                     request.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                    return await client.SendAsync(request);
-                }   
+                    var result = await client.SendAsync(request);
+                    var transactionId = await result.Content.ReadAsStringAsync();
+                    //return await client.SendAsync(request);
+
+                    if (result.IsSuccessStatusCode)
+                        return Redirect("https://localhost:44317/Payment/Create" + "/" + transactionId);
+                    else
+                        return View("CheckoutError");
+
+                };
+                //postasjsonasync ===> sans devoir serializer
             }
             else
-            {
-                Checkout();
-                return null;
+            {               
+                return Redirect("http://localhost:55147/Cart/Checkout");
             }
         }
 

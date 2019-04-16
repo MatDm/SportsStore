@@ -34,13 +34,16 @@ namespace SportsStoreApi.Controllers
 
         // POST: api/Payment
         [HttpPost]
-        //[Route("{payment}")]
-        public IActionResult PostPayment(PaymentData payment)
+        
+        public int Post([FromBody]decimal amount)
         {
-            db.Add(payment);
+            PaymentData paymentData = new PaymentData();
+            paymentData.AmountOfMoney = amount;
+
+            db.Add(paymentData);
             db.SaveChanges();
             //return "ok" vers mvc 5 avec l'id de la future transaction
-            return CreatedAtRoute("GetPaymentId", new { id = payment.Id }, payment);
+            return paymentData.Id;
         }
 
         // PUT: api/Payment/5
