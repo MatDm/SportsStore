@@ -33,6 +33,11 @@
                 <span asp-validation-for="ExpiryDate" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="AmountOfMoney"  class="control-label">Amount of dollarrrrs : @Model.AmountOfMoney</label>
+                @*<input asp-for="AmountOfMoney" class="form-control" />*@
+                <span asp-validation-for="AmountOfMoney" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <input type="submit" value="Proceed to payment" class="btn btn-default" />
             </div>
         </form>

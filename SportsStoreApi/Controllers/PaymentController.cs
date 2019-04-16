@@ -29,7 +29,8 @@ namespace SportsStoreApi.Controllers
         [HttpGet("{id}", Name = "Get")]
         public string Get(int id)
         {
-            return "value";
+           return db.PaymentDatas.FirstOrDefault(p => p.Id == id).AmountOfMoney.ToString();
+            
         }
 
         // POST: api/Payment

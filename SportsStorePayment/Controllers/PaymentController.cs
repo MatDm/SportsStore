@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SportsStorePayment.Models;
 
 namespace SportsStorePayment.Controllers
 {
@@ -22,9 +25,31 @@ namespace SportsStorePayment.Controllers
         }
 
         // GET: Payment/Create
-        public ActionResult Create()
+        public async Task<ActionResult> Create()
         {
-            return View("Create");
+            string Url = Request.Path;
+            string Id = Url.Split("/").Last();
+            PaymentDetails payment = new PaymentDetails();
+            payment.AmountOfMoney = await GetAmountOfMoney(Id);
+            return View("Create", payment);
+        }
+
+        private async Task<decimal> GetAmountOfMoney(string id)
+        {
+
+            string urlApi = "https://localhost:44347/api/Payment" + "/" + id;
+            using (var client = new HttpClient())
+            using (var request = new HttpRequestMessage())
+            {
+                request.Method = HttpMethod.Get;
+                request.RequestUri = new Uri(urlApi);
+
+
+                var result = await client.SendAsync(request);
+                var amountOfMoney = await result.Content.ReadAsStringAsync();
+                return decimal.Parse(amountOfMoney);
+            }
+            
         }
 
         // POST: Payment/Create
@@ -89,5 +114,7 @@ namespace SportsStorePayment.Controllers
                 return View();
             }
         }
+
+
     }
 }
