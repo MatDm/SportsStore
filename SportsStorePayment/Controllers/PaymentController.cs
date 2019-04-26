@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
-using System.Web.Script.Serialization;
+//using System.Web.Script.Serialization;
+//using System.Web.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using SportsStorePayment.Models;
 
 namespace SportsStorePayment.Controllers
@@ -30,6 +33,7 @@ namespace SportsStorePayment.Controllers
             string Url = Request.Path;
             string Id = Url.Split("/").Last();
             PaymentDetails payment = new PaymentDetails();
+            payment.Id = Id;
             payment.AmountOfMoney = await GetAmountOfMoney(Id);
             return View("Create", payment);
         }
@@ -54,18 +58,27 @@ namespace SportsStorePayment.Controllers
 
         // POST: Payment/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        //[ValidateAntiForgeryToken]
+        public async Task<ActionResult> Create(PaymentDetails paymentDetails)
         {
             try
             {
-                // TODO: Add insert logic here
+                string urlApi = $"https://localhost:44347/api/Payment/{paymentDetails.Id}";
+                using (var client = new HttpClient())
+                using (var request = new HttpRequestMessage())
+                {
+                    request.Method = HttpMethod.Put;
+                    request.RequestUri = new Uri(urlApi);
+                    var json = JsonConvert.SerializeObject(paymentDetails);
+                    request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+                    await client.SendAsync(request);
 
-                return RedirectToAction(nameof(Index));
+                    return Ok();
+                }
             }
-            catch
+            catch(Exception ex)
             {
-                return View();
+                return View("Error", ex);
             }
         }
 

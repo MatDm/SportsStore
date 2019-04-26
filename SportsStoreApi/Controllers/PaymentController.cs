@@ -47,10 +47,17 @@ namespace SportsStoreApi.Controllers
             return paymentData.Id;
         }
 
+
         // PUT: api/Payment/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public void Put(PaymentData paymentData)
         {
+            var paymentToUpdate = db.PaymentDatas.FirstOrDefault(p => p.Id == paymentData.Id);
+            paymentToUpdate.CardHolderName = paymentData.CardHolderName;
+            paymentToUpdate.CardNumber = paymentData.CardNumber;
+            paymentToUpdate.Cvv = paymentData.Cvv;
+            paymentToUpdate.ExpiryDate = paymentData.ExpiryDate;
+            db.SaveChanges();
         }
 
         // DELETE: api/ApiWithActions/5
